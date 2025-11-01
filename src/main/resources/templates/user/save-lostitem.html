@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th= "http://www.thymeleaf.org">
+<style>
+	.camera {
+		position:relative;
+		width:240px;
+		height:180px;
+	}
+	
+	#video {
+		position:absolute;
+		border: 1px solid#aaa;
+		width: 240px;
+		height: 180px;
+		z-index: 1;
+	}
+	#photo {
+		position:absolute;
+		z-index: 2;
+	}
+</style>
+<head th:replace="~{parts/common :: html_head()}"></head>
+<body>
+  <nav th:replace="~{parts/common :: navbar}"></nav>
+  
+  <div class="container">
+    <h1 class="my-4 h3">[[${heading}]]</h1>
+		<div class="alert alert-danger" th:errors="${lostItem.findDate}"></div>
+		<div class="alert alert-danger" th:errors="${lostItem.content}"></div>	<!-- 変更なしで保存押下時のmessage-->
+		<div class="alert alert-danger" th:errors="${lostItem.findPersonName}"></div>
+    <div class="row">
+      <div class="col-md-12">
+
+        <form class="form" action="" method="post" th:object="${lostItem}">
+          <div class="mb-3">
+              <label>拾得日：<input type="date" th:value="${#temporals.format(findDate, 'yyyy年MM月dd日(E)')}" th:field="*{findDate}"></label>
+          </div>
+					
+          <p class="mb-4">拾得場所：
+              <select th:field="*{areaId}">
+                  <option th:each="area : ${areaList}" th:value="${area.id}" th:text="${area.name}"></option>
+					    </select>
+          </p>
+					
+          <div class="mb-3">
+              <label>内容：<input type="text" th:field="*{content}"></label>
+          </div>
+					
+<!--      ここに写真ね"！-->
+					<div class="camera">
+						<video id="video" ></video>
+						<img id="photo" th:unless="${name == null}" th:src="@{/gallery/{img}(img=${name})}" style="width:240px; height:180px;">
+						<img id="photo" th:if="${name == null}">
+					</div>					
+						<button id="camera-photo" type="button">ｶﾒﾗ起動</button>
+
+          <div class="mb-3">
+              <label>拾得者名：<input type="text" size="10" th:field="*{findPersonName}"></label>
+          </div>
+      
+          <p class="mb-4">保管場所：
+              <select th:field="*{strageId}">
+                  <option th:each="strage : ${strageList}" th:value="${strage.id}">[[${strage.name}]]</option>
+              </select>
+          </p>
+       											
+					<th:block th:unless="${currentUri == '/user/add'}">		<!-- /user/addからのリクエスト時は非表示-->
+					<p class="mb-4">状態：
+						<select th:field="*{status}">
+	            <option th:each="status : ${statuses}" th:value="${status}">[[${status}]]</option>
+						</select>
+					</p>
+					</th:block>
+					
+          <div class="mb-3" >
+					<th:block th:unless="${currentUri == '/user/add'}">		<!-- /user/addからのリクエスト時は非表示-->
+              <label th:object="${infoOut}">編集内容入力：
+								<textarea placeholder="変更内容を記載" th:field="${infoOut.memo}">[[${infoOut.memo}]]</textarea>
+							</label>
+					</th:block>
+          </div> 
+						
+<!--          	<p class="mb-4" th:field="*{userName}">初回登録者 : [[*{userName}]]</p>-->
+					
+					<div>
+					<th:block th:unless="${currentUri == '/user/add'}">		<!-- /user/addからのリクエスト時は非表示-->
+						<p>変更履歴</p>
+						<ul th:object="${updateInfo}">
+								<li th:each="info : ${updateInfo}">[[${info.memo}]]: [[${#temporals.format(info.updateAt, 'yyyy年MM月dd日(E) HH時mm分ss秒')}]] by [[${info.modifyPersonName}]]</li>
+						</ul>
+					</th:block>
+      		</div>
+          
+					<input class="btn btn-primary" type="submit" value="保存する">
+          <a th:href="@{/user/list(page=${session.page})}" class="btn btn-secondary">キャンセル</a>
+<!--          <a th:href="@{/itemlist/list(page=${session.page})}" class="btn btn-secondary">キャンセル</a>-->
+        </form>
+      </div><!-- /.col- -->
+    </div><!-- /.row -->
+  </div><!-- /.container -->
+
+  <th:block th:replace="~{parts/common :: javascripts()}"></th:block>
+	
+	<script>
+	/*
+		// 各要素を取得
+		const video = document.getElementById('video');
+		const canvas = document.getElementById('canvas');
+		//const captureButton = document.getElementById('captureButton');
+		const captureButton = document.querySelector('#camera-photo');
+		const context = canvas.getContext('2d');
+
+		// カメラ映像の取得
+		navigator.mediaDevices.getUserMedia({ video: true })
+		    .then(stream => {
+		        video.srcObject = stream;
+		    })
+		    .catch(error => {
+		        console.error("カメラのアクセスに失敗しました:", error);
+		    });
+
+		// 撮影ボタンクリック時の処理
+		captureButton.addEventListener('click', () => {
+		    // キャンバスに現在の映像を描画
+		    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+		    // 画像データをBase64形式で取得
+		    const imageData = canvas.toDataURL('image/png');
+
+		    // JavaScriptで直接コントローラーに送信
+		    sendImageToServer(imageData);
+		});
+
+		function sendImageToServer(imageData) {
+		    // 画像データをPOSTリクエストで送信
+		    fetch('/upload', {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json'
+		        },
+		        body: JSON.stringify({ image: imageData })
+		    })
+		    .then(response => response.text())
+		    .then(message => {
+		        //alert(message);
+		    })
+		    .catch(error => {
+		        console.error('送信エラー:', error);
+		    });
+		}
+*/
+		
+		
+		const video = document.querySelector('#video');
+		const canvas = document.createElement('canvas');
+		const button = document.querySelector('#camera-photo');
+		let isCameraRunning = false;
+		
+		//initVideoCamera();
+		//initPhoto();
+		// cameraの起動・静止を押したとき
+		button.addEventListener('click', () => {
+			if (isCameraRunning) {	//	camera起動中の場合
+				try {
+					var obj = document.getElementById("none");
+					obj.id = "photo";
+				} catch(e) {
+					console.log("nonn がないね")
+				} finally {
+					initPhoto();
+				}	
+				getPhoto();		// 静止画を取り込む
+				disableCamera();	// cameraをoffにして、カメラと静止画の表示階層を変更
+				
+				// 画像データをBase64形式で取得
+				var imageData = canvas.toDataURL('image/jpeg');
+				//JavaScriptで直接コントローラーに送信
+				sendImageToServer(imageData);
+				
+				if (video.style.zIndex = 3) {
+					video.style.zIndex = 1;
+				}
+				
+			} else {	//カメラが停止している時
+				enableCamera();		// カメラをONにして,video	を最前面へ
+				if (video.style.zIndex = 1) {	
+					video.style.zIndex = 3;
+				}
+				
+				console.log("cameraStart");
+			}
+			isCameraRunning = !isCameraRunning;　カメラ動作フラグを反転
+		});
+
+		
+		//カメラを有効にする
+		
+		function enableCamera() {
+		    button.disabled = true;		//	ボタンの連打防止
+				navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+		        .then((stream) => {
+		            video.srcObject = stream;
+		            video.play();
+								button.disabled = false;
+								button.innerText = "静止";
+								
+						 })
+		        .catch(e => {
+							console.error("カメラの取得に失敗しました : ", e);
+						});
+		}
+	
+		//カメラを無効
+		function disableCamera() {
+			if (video.srcObject) {
+				video.srcObject.getTracks().forEach(track => track.stop());
+				button.innerText = "ｶﾒﾗ起動";
+				video.srcObject = null;
+			}
+		}
+		
+		
+		//写真の初期描画
+		function initPhoto() {
+				canvas.width = video.clientWidth;
+		    canvas.height = video.clientHeight;
+		    const context = canvas.getContext("2d");
+		    context.fillRect(0, 0, canvas.width, canvas.height);
+		    document.querySelector("#photo").src = canvas.toDataURL("image/jpeg");
+		}
+
+		//写真の撮影描画
+		
+		function getPhoto() {
+			  let drawSize = calcDrawSize();
+		    canvas.width = drawSize.width;
+		    canvas.height = drawSize.height;
+		    const context = canvas.getContext("2d");
+		    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+		    document.querySelector("#photo").src = canvas.toDataURL("image/jpeg");
+				
+				
+				
+		}
+
+		
+		// * 描画サイズの計算
+		// * 縦横比が撮影(video)が大きい時は撮影の縦基準、それ以外は撮影の横基準で計算
+		 
+		function calcDrawSize() {
+		    let videoRatio = video.videoHeight / video.videoWidth;
+		    let viewRatio = video.clientHeight / video.clientWidth;
+		    return videoRatio > viewRatio ?
+		        { height: video.clientHeight, width: video.clientHeight / videoRatio }
+		        : { height: video.clientWidth * videoRatio, width: video.clientWidth }
+		}
+			
+		function sendImageToServer(imageData) {
+				    // 画像データをPOSTリクエストで送信
+				    fetch('/upload', {
+				        method: 'POST',
+				        headers: {
+				            'Content-Type': 'application/json'
+				        },
+				        body: JSON.stringify({ image: imageData })
+				    })
+				    .then(response => response.text())
+				    .then(message => {
+				        alert(message);
+				    })
+				    .catch(error => {
+				        console.error('送信エラー:', error);
+				    });
+				}
+				
+	</script>
+</body>
+</html>

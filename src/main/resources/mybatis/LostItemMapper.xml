@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.app.mapper.LostItemMapper">
+
+	<resultMap id="lostitemMap" type="com.example.app.domain.LostItem">
+		<id property="id" column="id" />
+		<result property="findDate" column="find_date"/>
+		<result property="content" column="content"/>
+		<result property="status" column="status"/>
+		<result property="findPersonName" column="find_person_name" />
+<!--		<result property="memo" column="memo" />-->
+		<result property="registerAt" column="register_at" />
+<!--		<result property="updateAt" column="update_at" />-->
+<!--		<result property="typeId" column="type_id"/>-->
+<!--		<result property="typeName" column="type_name" />-->
+		<result property="areaId" column="area_id"/>
+		<result property="areaName" column="area_name" />
+		<result property="strageId" column="strage_id"/>
+		<result property="strageName" column="strage_name" />
+		<result property="userId" column="user_id"/>
+		<result property="userName" column="user_name" />
+
+	</resultMap>
+	
+	<sql id="selectAndJoin">
+		SELECT	lostitems.id, lostitems.find_date, lostitems.content,
+						lostitems.status, lostitems.find_person_name,
+						lostitems.register_at,
+<!--						item_types.id AS type_id,-->
+<!--						item_types.name AS type_name,-->
+						areas.id AS area_id,
+						areas.name AS area_name,
+						strages.id AS strage_id,
+						strages.name AS strage_name,
+						users.id AS user_id,
+						users.name AS user_name
+		FROM lostitems
+<!--		JOIN item_types-->
+		JOIN areas
+		JOIN strages
+		JOIN users
+			ON  lostitems.area_id = areas.id and
+					lostitems.strage_id = strages.id and
+					lostitems.user_id = users.id
+<!--					lostitems.type_id = item_types.id and -->
+	</sql>
+					
+	<select id="findAll" resultMap="lostitemMap">
+			<include refid="selectAndJoin" />
+	</select>
+	
+	<select id="findById" resultMap="lostitemMap">
+			<include refid="selectAndJoin" />
+			WHERE lostitems.id = #{id}
+	</select>
+	
+	<select id="findLimited" resultMap="lostitemMap">
+			<include refid="selectAndJoin" />
+			ORDER BY lostitems.id DESC
+			LIMIT #{offset}, #{limit} 
+	</select>
+	
+	<select id="count" resultType="long">
+			SELECT COUNT(*) FROM lostitems
+	</select>
+	
+	<insert id="insert" parameterType="LostItem"
+			useGeneratedKeys="true" keyProperty="id">
+			INSERT 	INTO lostitems 
+									(find_date, content, find_person_name,
+									register_at,
+									 area_id, strage_id, user_id
+									)
+<!--									type_id,-->
+							VALUES (#{findDate}, #{content},#{findPersonName},
+											NOW(),
+											#{areaId}, #{strageId}, #{userId})
+	</insert>
+
+	<update id="update" parameterType="LostItem">
+			UPDATE lostitems 
+			SET		find_date = #{findDate},
+						content = #{content},
+						find_person_name = #{findPersonName},
+						status = #{status},
+						register_at = #{registerAt},<!-- NOW(), -->
+						area_id = #{areaId},
+						strage_id = #{strageId},
+						user_id = #{userId}
+			WHERE lostitems.id = #{id} 
+	</update>
+<!--						type_id = #{typeId},-->
+	
+
+</mapper>
