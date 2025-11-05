@@ -20,9 +20,10 @@ public interface LostItemService {
 	//編集画面で内容が編集されているかチェック
 	Boolean isChangeObj(LostItem info1, LostItem info2);
 	
+	void deleteLostItem(Integer id);
+	
 	// pagination導入で書き直し
 //	List<LostItem> getLostItemByDate(Date from, Date to) throws Exception;
-//	void deleteLostItem(Integer id) throws Exception;
 //	void editLostItem(LostItem lostItem) throws Exception;
 //	List<LostItem> getLostItemListPerPage(int page, int numPerPage) throws Exception;
 //	int TotalPages(int numPage) throws Exception;

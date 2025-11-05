@@ -14,14 +14,13 @@
            <th:block th:if="${session.loginStatus.authority == '管理者'}">
 						 <a th:href="@{/admin/user/list}" class="btn btn-light" >ユーザー編集</a>
 						 <a class="btn btn-light" ><s>拾得場所追加</s></a>
-<!--						 <a class="btn btn-light" ><s>忘れ物分類追加</s></a>-->
 						 <a class="btn btn-light" ><s>保管場所追加</s></a>
 					 </th:block>
          </p>
         
-<!--        <div class="alert alert-success" th:if="${message}">-->
-<!--         [[${message}]]-->
-<!--        </div>-->
+        <div class="alert alert-success" th:if="${message}">
+         [[${message}]]
+        </div>
         
         <table class="table table-bordered">
           <thead>
@@ -35,7 +34,9 @@
               <th>保管場所</th>
 <!--              <th>最終更新日</th>-->
               <th>編集</th>
-              <th>処理済</th>
+							<th:block th:if="${session.loginStatus.authority == '管理者'}">
+								<th>削除</th>
+							</th:block>
             </tr>
           </thead>
           <tbody>
@@ -47,7 +48,9 @@
 	          <td>[[${lostItem.status}]]</td>
 	          <td>[[${lostItem.strageName}]]</td>
 	          <td><a th:href="@{/user/edit/{id}(id=${lostItem.id})}" class="btn btn-warning btn-sm">編集</a></td>
-	          <td><a  tabindex="-1" class="btn btn-danger btn-sm delete"><s><span style="color:#000;" >処理済</span></s></a></td>
+						<th:block th:if="${session.loginStatus.authority == '管理者'}">
+							<td><a th:href="@{/user/delete/{id}(id=${lostItem.id})}" class="btn btn-danger btn-sm delete">削除</a></td>
+						</th:block>
 	        </tr>
           </tbody>
         </table>

@@ -19,8 +19,8 @@ public interface LostItemMapper {
 	
 	void insert(LostItem lostItem) ;
 	void update(LostItem lostItemd) ;
+	void delete(Integer id);
 //	List<LostItem> findByDate(Date from, Date to) throws Exception;
-//	void delete(Integer id) throws Exception;
 //	long countAll() throws Exception;
 //	long countFindByDate(Date from, Date to) throws Exception;
 	

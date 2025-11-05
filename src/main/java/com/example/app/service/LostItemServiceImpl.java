@@ -64,5 +64,9 @@ public class LostItemServiceImpl implements LostItemService {
 			}
 				return true;
 	}
+	// 削除
+	public void deleteLostItem(Integer id) {
+		lostItemMapper.delete(id);
+	}
 	
 }

@@ -57,7 +57,7 @@
 	
 	<select id="findLimited" resultMap="lostitemMap">
 			<include refid="selectAndJoin" />
-			ORDER BY lostitems.id DESC
+			ORDER BY lostitems.find_date DESC, lostitems.id DESC
 			LIMIT #{offset}, #{limit} 
 	</select>
 	
@@ -91,6 +91,11 @@
 			WHERE lostitems.id = #{id} 
 	</update>
 <!--						type_id = #{typeId},-->
+
+	<delete id="delete" parameterType="int">
+			DELETE FROM lostitems
+			WHERE lostitems.id = #{id}
+	</delete>
 	
 
 </mapper>

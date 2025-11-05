@@ -3,6 +3,9 @@ package com.example.app.controller;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -138,6 +141,7 @@ public class LostItemController {
 				lostItem.setUserId(loginStatus.getId());
 				
 				service.addLostItem(lostItem);
+				
 				//
 				// 画像が取り込まれている時は、画像を保存する
 				//
@@ -152,21 +156,6 @@ public class LostItemController {
 	        		e.printStackTrace();
 	            }
 
-				
-				
-				
-				
-//				File oldFile = new File(UPLOAD_DIRECTORY + "/temp.jpg");
-//				File newFile = new File(UPLOAD_DIRECTORY + "/photo_"+ Integer.toString(lostItem.getId()) + ".jpg");
-//
-//				if(oldFile.renameTo(newFile)) {
-//					System.out.println("変更OK");
-//				}else {
-//					System.out.println("変更失敗");
-//				}
-				
-				
-				
 				redirectAttributes.addFlashAttribute("message", "忘れ物を新規登録しました。");
 				// 追加後に戻るページ
 				int totalPages = service.getTotalPages(NUM_PER_PAGE);
@@ -314,12 +303,27 @@ public class LostItemController {
 				return "redirect:/user/list?page=" + previousPage;
 	}
 	
+	@GetMapping("/user/delete/{id}")
+	public String delete(@PathVariable Integer id,
+						RedirectAttributes rd )throws Exception {
+					service.deleteLostItem(id);
+					rd.addFlashAttribute("message","忘れ物情報を削除しました。");
+					// 画像の削除
+					String fileName = "photo_" + Integer.toString(id) + ".jpg";
+					if (isImgFile(fileName)) {
+						Path path = Paths.get(UPLOAD_DIRECTORY + "/" + fileName);
+						Files.delete(path);
+					}
+					return "redirect:/user/list";
+		
+	}
 	
-
-		// 画像があるかないか まだ機能していない！
-		public String setImgFileName (String imgName) {
+	
+	
+		// 画像があるかないか,存在する場合true
+		public Boolean isImgFile (String imgName) {
 			// アップロードされているファイルのリストの取得
-			String fileName = "";
+			Boolean isImgFile = false;
 			File uploadsDirectory = new File(UPLOAD_DIRECTORY);
 			File[] fileList = uploadsDirectory.listFiles();
 			
@@ -328,10 +332,10 @@ public class LostItemController {
 			//
 			for (String name : fileNames) {
 				if (name.equals(imgName)) {
-					fileName = name;
+					isImgFile = true;
 					break;
 				}
 			}
-			return fileName;
+			return isImgFile;
 		}
 }
