@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 	public class UpdateInfoServiceImpl implements UpdateInfoService{
 	
-		 private final UpdateInfoMapper updateInfoMapper;
+		private final UpdateInfoMapper updateInfoMapper;
 	
 		@Override
 		public List<UpdateInfo> getUpdateInfoList() throws Exception {
@@ -29,17 +29,28 @@ import lombok.RequiredArgsConstructor;
 		public void addUpdateInfo(UpdateInfo updateInfo) throws Exception{
 			updateInfoMapper.insert(updateInfo);
 		}
+
+		@Override
+		public List<Integer> getUpdateInfoId(Integer id) throws Exception{
+			return updateInfoMapper.selectByContentId(id);
+		}
 		
 		@Override
 		public Boolean isOkLength(UpdateInfo updateInfo) throws Exception{
 			if(updateInfo.getMemo().length() > 100) {
+				System.out.println("NGLength:" + updateInfo.getMemo().length() );
 				return false;
 			}else {
+				System.out.println("OKLength:" + updateInfo.getMemo().length() );
 				return true;
 			}
 			
 		}
 		
+		@Override
+		public void deleteUpdateInfo(Integer id) throws Exception{
+			updateInfoMapper.delete(id);
+		}
 		
 				
 		

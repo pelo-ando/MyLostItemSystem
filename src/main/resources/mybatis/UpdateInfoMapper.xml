@@ -24,5 +24,15 @@
 	 INSERT INTO updateinfoes 
 	 			(content_id, memo, modify_person_id, update_at) 
 	 VALUES (#{contentId}, #{memo},  #{modifyPersonId}, now()) </insert>
+	 
+	<delete id="delete" parameterType="int">
+			DELETE FROM updateinfoes
+			WHERE id = #{id}
+	</delete>
+	
+	<select id="selectByContentId" parameterType="int">
+			SELECT id FROM updateinfoes
+			WHERE content_id = #{id}
+	</select>
 
 </mapper>

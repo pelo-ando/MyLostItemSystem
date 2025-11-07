@@ -12,5 +12,7 @@ public interface UpdateInfoMapper {
 	List<UpdateInfo> selectAll() throws Exception;
 	List<UpdateInfo> selectById(Integer id) throws Exception;
 	void insert(UpdateInfo updateInfo) throws Exception;
+	void delete(Integer id) throws Exception;
+	List<Integer> selectByContentId(Integer id) throws Exception;
 	
 }

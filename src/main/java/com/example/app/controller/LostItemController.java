@@ -240,22 +240,22 @@ public class LostItemController {
 					}
 				// 変更箇所がない場合メッセージを表示する
 				// 変更箇所がある場合、または変更内容テキストに入力がある場合のみ、保存処理をする
-//				if(oldLostItem.getFindDate().equals(lostItem.getFindDate()) &&
-//					oldLostItem.getAreaId() == lostItem.getAreaId() &&
-//					oldLostItem.getContent().equals(lostItem.getContent()) &&
-//					oldLostItem.getFindPersonName().equals(lostItem.getFindPersonName()) &&
-//					oldLostItem.getStrageId() == lostItem.getStrageId() &&
-//					oldLostItem.getStatus().equals(lostItem.getStatus())) {
-
+				// Memo入力文字が100文字を超える場合もメッセージを出力	
 				LostItem oldLostItem = (LostItem) session.getAttribute("oriLostItem");
-				if(!(service.isChangeObj(oldLostItem, lostItem)) || !(updateInfoService.isOkLength(infoOut))){
-					if(!(service.isChangeObj(oldLostItem,lostItem))){
-						errors.rejectValue("content", "error.nonChange_items");
-					} // end if
-					if(!(updateInfoService.isOkLength(infoOut))) {
+				Integer memoLength = infoOut.getMemo().length();
+				if(((memoLength > 0) && (memoLength <= 100)) ||
+						(memoLength == 0) && (service.isChangeObj(oldLostItem, lostItem))){
+					//保存
+				}else {
+					if(memoLength > 100) {
 						errors.rejectValue("findPersonName", "error.over_length_info_memo");
-					} // end if
-									
+					}else {
+						if(!service.isChangeObj(oldLostItem, lostItem)) {
+							errors.rejectValue("content", "error.nonChange_items");
+						}
+					}
+					// Memoに100文字以上入力されている場合
+					// 変更がない場合は、エラーメッセージを出力して戻る
 					model.addAttribute("areaList", areaService.getAreaList());
 					model.addAttribute("strageList", strageService.getStrageList());
 					model.addAttribute("user", userService.getUserById(id));
@@ -265,13 +265,15 @@ public class LostItemController {
 					model.addAttribute("currentUri", currentUri);
 					// statusをStremで渡す
 					Stream<String> stream =
-							Stream.of("保管中", "対応中", "処置済", "警察届中", "その他");
+						Stream.of("保管中", "対応中", "処置済", "警察届中", "その他");
 					model.addAttribute("statuses", stream);
 					UpdateInfo updateInfo = new UpdateInfo();
 					model.addAttribute("infoOut", updateInfo);
 					//
 					return "user/save-lostitem";
-				}
+				}	// endif
+				
+	
 				
 				// 編集データの保存準備
 				infoOut.setContentId(lostItem.getId());
@@ -303,6 +305,7 @@ public class LostItemController {
 				return "redirect:/user/list?page=" + previousPage;
 	}
 	
+	
 	@GetMapping("/user/delete/{id}")
 	public String delete(@PathVariable Integer id,
 						RedirectAttributes rd )throws Exception {
@@ -314,6 +317,11 @@ public class LostItemController {
 						Path path = Paths.get(UPLOAD_DIRECTORY + "/" + fileName);
 						Files.delete(path);
 					}
+					// 更新履歴の削除
+					for (Integer lostItemId : updateInfoService.getUpdateInfoId(id)) {
+						updateInfoService.deleteUpdateInfo(lostItemId);
+					}
+					
 					return "redirect:/user/list";
 		
 	}
